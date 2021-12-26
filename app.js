@@ -2,9 +2,15 @@ class DrumKit{
     constructor(){
         this.pads = document.querySelectorAll(".pad");
         this.playBtn = document.querySelector(".play");
+        this.currentKick = "./sound/kick-classic.wav";
+        this.currentSnare = "./sound/snare-acoustic01.wav";
+        this.currentHihat = "./sound/hihat-acoustic01.wav";
         this.kickAudio = document.querySelector(".kick-sound");
         this.snareAudio = document.querySelector(".snare-sound");
         this.hihatAudio = document.querySelector(".hihat-sound");
+        this.selects = document.querySelectorAll("select");
+        this.muteBtns = document.querySelectorAll(".mute");
+        this.tempoSlider = document.querySelector(".tempo-slider");
         this.index = 0;
         this.bpm = 150; 
         this.isPlying = null;
@@ -62,8 +68,69 @@ class DrumKit{
 
     }
   }
-}
+  changeSound(e) {
+    const selectionName = e.target.name;
+    const selectionValue = e.target.value;
+    switch (selectionName) {
+      case "kick-select":
+        this.kickAudio.src = selectionValue;
+        break;
+      case "snare-select":
+        this.snareAudio.src = selectionValue;
+        break;
+      case "hihat-select":
+        this.hihatAudio.src = selectionValue;
+        break;
+    }
+  }
+  mute(e){
+    const muteIndex = e.target.getAttribute("data-track");
+    e.target.classList.toggle("active");
+    if(e.target.classList.contains("active")){
+      switch(muteIndex){
+        case "0":
+          this.kickAudio.volume = 0;
+        break;
+        case "1":
+          this.snareAudio.volume = 0;
+        break;
+        case "2":
+          this.hihatAudio.volume = 0;
+        break;
+      }
+    } else{
+      switch(muteIndex){
+        case "0":
+          this.kickAudio.volume = 1;
+        break;
+        case "1":
+          this.snareAudio.volume = 1;
+        break;
+        case "2":
+          this.hihatAudio.volume = 1;
+    }
+     
+  }
+ }
+ changeTempo(e){
+   const tempoText = document.querySelector(".tempo-numb");
+   this.bpm =  e.target.value;
+   tempoText.innerText = e.target.value;
+ }
+ updateTempo(e){
+  clearInterval(this.isPlying);
+  this.isPlying = null;
+  const playBtn= document.querySelector(".play");
+  if(playBtn.classList.contains("active")){
+    this.start();
+  }
+ }
+} 
 const drumKit = new DrumKit();
+
+//EVENT LISTINERS
+
+
 drumKit.pads.forEach(pad =>{
   pad.addEventListener("click", drumKit.activePad);
   pad.addEventListener("animationend", function() {
@@ -74,3 +141,21 @@ drumKit.playBtn.addEventListener("click", function() {
   drumKit.updateBtn();
   drumKit.start(); 
 } );
+
+drumKit.selects.forEach(select =>{
+  select.addEventListener("change", function(e){
+    drumKit.changeSound(e);
+  });
+});
+drumKit.muteBtns.forEach(btn =>{
+  btn.addEventListener("click", function(e){
+    drumKit.mute(e);
+  });
+});
+drumKit.tempoSlider.addEventListener("input", function(e){
+  drumKit.changeTempo(e);
+});
+drumKit.tempoSlider.addEventListener("change", function(e){
+  drumKit.updateTempo(e);
+});
+ 
